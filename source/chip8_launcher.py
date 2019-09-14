@@ -23,12 +23,14 @@ class Launcher():
         if color.isValid():
             self.on_pixel_color = color.getRgb()
             self.left_btn.setStyleSheet(f"background-color:rgba{self.on_pixel_color}")
+        self.open_rom_btn.setFocus()
 
     def right_btn_pressed(self):
         color = QtWidgets.QColorDialog.getColor()
         if color.isValid():
             self.off_pixel_color = color.getRgb()
             self.right_btn.setStyleSheet(f"background-color:rgba{self.off_pixel_color}")
+        self.open_rom_btn.setFocus()
 
     def open_rom_button_pressed(self):
         # open filedialog
@@ -37,15 +39,21 @@ class Launcher():
         # set self rompath to path
         file_path = QtWidgets.QFileDialog.getOpenFileName()[0]
         file_name = file_path.replace("\\", "/").split("/")[-1]
-        print(file_name)
-        if len(file_name.split(".")) == 1 or file_name.endswith(".ch8"):
-            self.rom_path = file_path
-            self.open_rom_btn.setText(file_name)
+        print(file_path)
+        if file_path:
+            if len(file_name.split(".")) == 1 or file_name.endswith(".ch8"):
+                self.rom_path = file_path
+                self.open_rom_btn.setText(file_name)
+                self.start_game_btn.setFocus()
+            else:
+                QtWidgets.QMessageBox.warning(
+                    self.launcher_window, 'U trying to trick me?',
+                    """<b>If you try to open the wrong files I will delete your PC!!!</b>""",
+                    QtWidgets.QMessageBox.Ok)
+                self.open_rom_btn.setFocus()
         else:
-            QtWidgets.QMessageBox.warning(
-                self.launcher_window, 'U trying to trick me?',
-                """<b>If you try to open the wrong files I will delete your PC!!!</b>""",
-                QtWidgets.QMessageBox.Ok)
+            self.open_rom_btn.setFocus()
+
 
     def start_game_btn_pressed(self):
         # check if rompath is not empty
@@ -66,6 +74,7 @@ class Launcher():
         size_policy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Minimum)
         self.open_rom_btn.setSizePolicy(size_policy)
         self.open_rom_btn.setText("Open Rom")
+        self.open_rom_btn.setFocus()
         self.verticalLayout_2.addWidget(self.open_rom_btn)
 
         self.start_game_btn = QtWidgets.QPushButton(self.centralwidget)
