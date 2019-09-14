@@ -35,7 +35,17 @@ class Launcher():
         # get path to file
         # check fileending
         # set self rompath to path
-        pass
+        file_path = QtWidgets.QFileDialog.getOpenFileName()[0]
+        file_name = file_path.replace("\\", "/").split("/")[-1]
+        print(file_name)
+        if len(file_name.split(".")) == 1 or file_name.endswith(".ch8"):
+            self.rom_path = file_path
+            self.open_rom_btn.setText(file_name)
+        else:
+            QtWidgets.QMessageBox.warning(
+                self.launcher_window, 'U trying to trick me?',
+                """<b>If you try to open the wrong files I will delete your PC!!!</b>""",
+                QtWidgets.QMessageBox.Ok)
 
     def start_game_btn_pressed(self):
         # check if rompath is not empty
