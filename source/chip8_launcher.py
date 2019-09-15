@@ -1,4 +1,5 @@
 from PySide2 import QtCore, QtWidgets, QtGui
+from emulation import start_emulation
 
 
 class Launcher():
@@ -33,14 +34,10 @@ class Launcher():
         self.open_rom_btn.setFocus()
 
     def open_rom_button_pressed(self):
-        # open filedialog
-        # get path to file
-        # check fileending
-        # set self rompath to path
         file_path = QtWidgets.QFileDialog.getOpenFileName()[0]
         file_name = file_path.replace("\\", "/").split("/")[-1]
-        print(file_path)
         if file_path:
+            # check if the rom doesnt have a fileending or a .ch8 one
             if len(file_name.split(".")) == 1 or file_name.endswith(".ch8"):
                 self.rom_path = file_path
                 self.open_rom_btn.setText(file_name)
@@ -58,7 +55,10 @@ class Launcher():
     def start_game_btn_pressed(self):
         # check if rompath is not empty
         # if rompath there start emuloop with class parameters
-        pass 
+        if self.rom_path != "":
+            self.launcher_window.close()
+            start_emulation(self.rom_path, self.on_pixel_color, self.off_pixel_color)
+
 
     def create_window(self):
         self.launcher_window = QtWidgets.QMainWindow()
