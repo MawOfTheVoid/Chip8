@@ -7,18 +7,18 @@ class Launcher():
         self.init_emulator_attributes()
         self.create_window()
         self.bind_buttons()
-    
+
     def init_emulator_attributes(self):
         self.rom_path = ""
         self.off_pixel_color = (36, 36, 36, 255)
         self.on_pixel_color = (0, 217, 0, 255)
-    
+
     def bind_buttons(self):
         self.left_btn.clicked.connect(self.left_btn_pressed)
         self.right_btn.clicked.connect(self.right_btn_pressed)
         self.open_rom_btn.clicked.connect(self.open_rom_button_pressed)
         self.start_game_btn.clicked.connect(self.start_game_btn_pressed)
-    
+
     def left_btn_pressed(self):
         color = QtWidgets.QColorDialog.getColor()
         if color.isValid():
@@ -51,14 +51,10 @@ class Launcher():
         else:
             self.open_rom_btn.setFocus()
 
-
     def start_game_btn_pressed(self):
-        # check if rompath is not empty
-        # if rompath there start emuloop with class parameters
         if self.rom_path != "":
             self.launcher_window.close()
             start_emulation(self.rom_path, self.on_pixel_color, self.off_pixel_color)
-
 
     def create_window(self):
         self.launcher_window = QtWidgets.QMainWindow()
