@@ -10,4 +10,4 @@ def start_emulation(rom_path, on_pixel_color, off_pixel_color):
     emu_loop(chip8, screen)
 
 def emu_loop(chip8, screen):
-    print("moin")
+    pass

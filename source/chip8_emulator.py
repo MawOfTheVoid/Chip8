@@ -15,9 +15,12 @@ class Chip8():
         with open(self.rom_path, "rb") as file_obj:
             rom = file_obj.read()
         rom = binascii.hexlify(rom)
+        # split rom into two hex values each
         rom = [rom[i:i + 2] for i in range(0, len(rom), 2)]
-        for a in rom:
-            print(a)
+        # converts them from binary string to normal string
+        rom = [hex(int(register, 16)) for register in rom]
+        for register in rom:
+            print(register)
 
     def fonts(self):
         fonts = [
