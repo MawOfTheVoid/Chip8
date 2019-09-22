@@ -31,8 +31,17 @@ class Screen():
             self.update_rect_sizes()
             self.is_fullscreen = True
 
+    def resize(self, width, height):
+        self.screen_width = width
+        self.screen_height = height
+        pygame.display.set_mode(
+            (self.screen_width, self.screen_height),
+            flags=pygame.RESIZABLE)
+        self.update_rect_sizes()
+
     def update_rect_sizes(self):
-        pass
+        self.rect_width = self.screen_width / 64
+        self.rect_height = self.screen_height / 32
 
     def draw_matrix(self):
         pass

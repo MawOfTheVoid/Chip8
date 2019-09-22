@@ -25,16 +25,19 @@ class Chip8():
     def system_relevant_keypress(self, event):
         if event.type == pygame.QUIT:
             sys.exit()
+        elif event.type == pygame.VIDEORESIZE:
+            self.screen.resize(event.w, event.h)
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_RETURN:
                 self.screen.toggle_fullscreen()
+            elif event.key == pygame.K_ESCAPE:
+                sys.exit()
 
     def game_keydown(self, event):
         pass
 
     def game_keyup(self, event):
         pass
-
 
     def fetch_opcode(self):
         pass
