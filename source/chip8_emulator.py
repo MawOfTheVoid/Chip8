@@ -44,7 +44,7 @@ class Chip8():
         part_two = self.memory[self.pc+1]
         part_one = part_one << 8
         self.opcode = part_one + part_two
-        self.pc += 2
+        #self.pc += 2
 
     def execute_opcode(self):
         pass
