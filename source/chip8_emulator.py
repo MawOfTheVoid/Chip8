@@ -4,12 +4,34 @@ class Chip8():
 
     def __init__(self, rom_path, screen):
         self.rom_path = rom_path
+        self.screen_matrix = screen.screen_matrix
         self.memory = self.prepare_memory()
+        self.pc = 512
+        self.I_register = 0
+        self.stack = []
+        self.delay_timer = 0
+        self.music_timer = 0
+        self.keyboard_register = []
+        self.opcode = ""
+
+    def get_input(self):
+        pass
+
+    def fetch_opcode(self):
+        pass
+
+    def execute_opcode(self):
+        pass
+
+    def count_down_timers(self):
+        pass
 
     def prepare_memory(self):
-        memory = self.fonts()
-        memory += 4016 * [0]
-        memory = self.load_rom(memory)
+        memory = self.memory_fonts()
+        memory += 432 * [0]
+        memory += self.load_rom(memory)
+        memory += (4096 - len(memory)) * [0]
+        self.memory = memory
 
     def load_rom(self, memory):
         with open(self.rom_path, "rb") as file_obj:
@@ -19,10 +41,10 @@ class Chip8():
         rom = [rom[i:i + 2] for i in range(0, len(rom), 2)]
         # converts them from binary string to normal string
         rom = [hex(int(register, 16)) for register in rom]
-        for register in rom:
-            print(register)
+        return rom
 
-    def fonts(self):
+
+    def memory_fonts(self):
         fonts = [
             # font for 0
             "0xF0", "0x90", "0x90", "0x90", "0xF0",
