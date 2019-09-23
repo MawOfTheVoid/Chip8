@@ -15,6 +15,6 @@ def emu_loop(chip8, screen):
     while True:
         chip8.get_input()
         chip8.fetch_opcode()
-        chip8.fetch_opcode()
+        chip8.execute_opcode()
         chip8.count_down_timers()
         screen.draw_matrix()
