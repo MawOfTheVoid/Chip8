@@ -1,3 +1,4 @@
+from opcode_variables import get_nnn, get_x, get_y, get_kk
 from PySide2 import QtWidgets
 import binascii
 import pygame
@@ -12,6 +13,7 @@ class Chip8():
         self.screen = screen
         self.memory = self.prepare_memory()
         self.pc = 512
+        self.register = 16 * [0]
         self.I_register = 0
         self.stack = []
         self.delay_timer = 0
@@ -252,61 +254,138 @@ class Chip8():
         self.f_opcodes[opcode_identifier]()
 
     def op_00E0(self):
-        print("00E0")
+        # print("00E0")
+        for row in self.screen.screen_matrix:
+            for index, pixel in enumerate(row):
+                row[index] = 0
 
     def op_00EE(self):
-        print("00EE")
+        # print("00EE")
+        self.pc = self.stack.pop()
 
     def op_1nnn(self):
-        print("1nnn")
+        # print("1nnn")
+        self.pc = get_nnn(self.opcode)
 
     def op_2nnn(self):
-        print("2nnn")
+        # print("2nnn")
+        nnn = get_nnn(self.opcode)
+        self.pc += 2
+        self.stack.append(self.pc)
+        self.pc = nnn
 
     def op_3xkk(self):
-        print("3xkk")
+        # print("3xkk")
+        x = get_x(self.opcode)
+        kk = get_kk(self.opcode)
+        if x == kk:
+            self.pc += 2
 
     def op_4xkk(self):
-        print("4xkk")
+        # print("4xkk")
+        x = get_x(self.opcode)
+        kk = get_kk(self.opcode)
+        if x != kk:
+            self.pc += 2
 
     def op_5xy0(self):
-        print("5xy0")
+        # print("5xy0")
+        x = get_x(self.opcode)
+        y = get_y(self.opcode)
+        if x == y:
+            self.pc += 2
 
     def op_6xkk(self):
-        print("6xkk")
+        # print("6xkk")
+        x = get_x(self.opcode)
+        kk = get_kk(self.opcode)
+        self.register[x] = kk
 
     def op_7xkk(self):
-        print("7xkk")
+        # print("7xkk")
+        x = get_x(self.opcode)
+        kk = get_kk(self.opcode)
+        self.register[x] += kk
+        if self.register[x] > 255:
+            self.register[x] = self.register[x] & 0xFF
 
     def op_8xy0(self):
-        print("8xy0")
+        # print("8xy0")
+        x = get_x(self.opcode)
+        y = get_y(self.opcode)
+        self.register[x] = self.register[y]
 
     def op_8xy1(self):
-        print("8xy1")
+        #print("8xy1")
+        x = get_x(self.opcode)
+        y = get_y(self.opcode)
+        self.register[x] = self.register[x] | self.register[y]
 
     def op_8xy2(self):
-        print("8xy2")
+        #print("8xy2")
+        x = get_x(self.opcode)
+        y = get_y(self.opcode)
+        self.register[x] = self.register[x] & self.register[y]
 
     def op_8xy3(self):
-        print("8xy3")
+        #print("8xy3")
+        x = get_x(self.opcode)
+        y = get_y(self.opcode)
+        self.register[x] = self.register[x] ^ self.register[y]
 
     def op_8xy4(self):
-        print("8xy4")
+        #print("8xy4")
+        x = get_x(self.opcode)
+        y = get_y(self.opcode)
+        self.register[x] += self.register[y]
+        if self.register[x] > 255:
+            self.register[x] = self.register[x] & 0xFF
+            self.register[15] = 1
+        elif self.register[x] <= 255:
+            self.register[15] = 0
 
     def op_8xy5(self):
-        print("8xy5")
+        #print("8xy5")
+        x = get_x(self.opcode)
+        y = get_y(self.opcode)
+        self.register[x] -= self.register[y]
+        if self.register[x] < 0:
+            self.register[15] = 0
+            self.register[x] = self.register[x] & 0xFF
+        elif self.register[x] >= 0:
+            self.register[15] = 1
 
     def op_8xy6(self):
-        print("8xy6")
+        #print("8xy6")
+        x = get_x(self.opcode)
+        y = get_y(self.opcode)
+        self.register[15] = self.register[x] & 0x0001
+        self.register[x] = self.register[x] // self.register[y]
 
     def op_8xy7(self):
-        print("8xy7")
+        #print("8xy7")
+        x = get_x(self.opcode)
+        y = get_y(self.opcode)
+        self.register[x] -= self.register[y]
+        if self.register[x] < 0:
+            self.register[15] = 0
+            self.register[x] = self.register[x] & 0xFF
+        elif self.register[x] >= 0:
+            self.register[15] = 1
 
     def op_8xyE(self):
         print("8xyE")
+        x = get_x(self.opcode)
+        y = get_y(self.opcode)
+        self.register[15] = self.register[x] & 0x0001
+        self.register[x] *= self.register[y]
+        if self.register[x] > 255:
+            self.register[x] = self.register[x] & 0xFF
 
     def op_9xy0(self):
         print("9xy0")
+        x = get_x(self.opcode)
+        y = get_y(self.opcode)
 
     def op_Annn(self):
         print("Annn")
