@@ -1,3 +1,4 @@
+from PySide2 import QtWidgets
 import binascii
 import pygame
 import sys
@@ -6,6 +7,7 @@ import sys
 class Chip8():
 
     def __init__(self, rom_path, screen):
+        self.assign_dicts()
         self.rom_path = rom_path
         self.screen = screen
         self.memory = self.prepare_memory()
@@ -19,6 +21,61 @@ class Chip8():
         self.sound = pygame.mixer.Sound("chip8_sound.wav")
         self.sound.play(loops=-1)
         pygame.mixer.pause()
+
+    def assign_dicts(self):
+        self.function_switch = {
+            0x0: self.zero_functions,
+            0x1: self.op_1nnn,
+            0x2: self.op_2nnn,
+            0x3: self.op_3xkk,
+            0x4: self.op_4xkk,
+            0x5: self.op_5xy0,
+            0x6: self.op_6xkk,
+            0x7: self.op_7xkk,
+            0x8: self.eight_functions,
+            0x9: self.op_9xy0,
+            0xA: self.op_Annn,
+            0xB: self.op_Bnnn,
+            0xC: self.op_Cxkk,
+            0xD: self.op_Dxyn,
+            0xE: self.e_functions,
+            0xF: self.f_functions,
+        }
+
+        self.zero_opcodes = {
+            0xE0: self.op_00E0,
+            0xEE: self.op_00EE,
+            0x00: lambda: None
+        }
+
+        self.eight_opcodes = {
+            0x0: self.op_8xy0,
+            0x1: self.op_8xy1,
+            0x2: self.op_8xy2,
+            0x3: self.op_8xy3,
+            0x4: self.op_8xy4,
+            0x5: self.op_8xy5,
+            0x6: self.op_8xy6,
+            0x7: self.op_8xy7,
+            0xE: self.op_8xyE
+        }
+
+        self.e_opcodes = {
+            0x9E: self.op_Ex9E,
+            0xA1: self.op_ExA1
+        }
+
+        self.f_opcodes = {
+            0x07: self.op_Fx07,
+            0x0A: self.op_Fx0A,
+            0x15: self.op_Fx15,
+            0x18: self.op_Fx18,
+            0x1E: self.op_Fx1E,
+            0x29: self.op_Fx29,
+            0x33: self.op_Fx33,
+            0x55: self.op_Fx55,
+            0x65: self.op_Fx65
+        }
 
     def get_input(self):
         for event in pygame.event.get():
@@ -112,82 +169,11 @@ class Chip8():
         part_two = self.memory[self.pc + 1]
         part_one = part_one << 8
         self.opcode = part_one + part_two
-        # self.pc += 2
+        self.pc += 2
 
     def execute_opcode(self):
-        try:
-            if self.opcode == 0x00E0:
-                self.op_00E0(self.opcode)
-            elif self.opcode == 0x00EE:
-                self.op_00EE(self.opcode)
-            elif self.opcode & 0x1000 == 0x1000:
-                self.op_1nnn(self.opcode)
-            elif self.opcode & 0x2000 == 0x2000:
-                self.op_2nnn(self.opcode)
-            elif self.opcode & 0x3000 == 0x3000:
-                self.op_3xkk(self.opcode)
-            elif self.opcode & 0x4000 == 0x4000:
-                self.op_4xkk(self.opcode)
-            elif self.opcode & 0x5000 == 0x5000:
-                self.op_5xy0(self.opcode)
-            elif self.opcode & 0x6000 == 0x6000:
-                self.op_6xkk(self.opcode)
-            elif self.opcode & 0x7000 == 0x7000:
-                self.op_7xkk(self.opcode)
-            elif self.opcode & 0x8000 == 0x8000:
-                self.op_8xy0(self.opcode)
-            elif self.opcode & 0x8001 == 0x8001:
-                self.op_8xy1(self.opcode)
-            elif self.opcode & 0x8001 == 0x8001:
-                self.op_8xy1(self.opcode)
-            elif self.opcode & 0x8002 == 0x8002:
-                self.op_8xy2(self.opcode)
-            elif self.opcode & 0x8003 == 0x8003:
-                self.op_8xy3(self.opcode)
-            elif self.opcode & 0x8004 == 0x8004:
-                self.op_8xy4(self.opcode)
-            elif self.opcode & 0x8005 == 0x8005:
-                self.op_8xy5(self.opcode)
-            elif self.opcode & 0x8006 == 0x8006:
-                self.op_8xy6(self.opcode)
-            elif self.opcode & 0x8007 == 0x8007:
-                self.op_8xy7(self.opcode)
-            elif self.opcode & 0x800e == 0x800e:
-                self.op_8xyE(self.opcode)
-            elif self.opcode & 0x9000 == 0x9000:
-                self.op_9xy0(self.opcode)
-            elif self.opcode & 0xA000 == 0xA000:
-                self.op_Annn(self.opcode)
-            elif self.opcode & 0xB000 == 0xB000:
-                self.op_Bnnn(self.opcode)
-            elif self.opcode & 0xC000 == 0xC000:
-                self.op_Cxkk(self.opcode)
-            elif self.opcode & 0xD000 == 0xD000:
-                self.op_Dxyn(self.opcode)
-            elif self.opcode & 0xE09E == 0xE09E:
-                self.op_Ex9E(self.opcode)
-            elif self.opcode & 0xE0A1 == 0xE0A1:
-                self.op_ExA1(self.opcode)
-            elif self.opcode & 0xF007 == 0xF007:
-                self.op_Fx07(self.opcode)
-            elif self.opcode & 0xF00A == 0xF00A:
-                self.op_Fx0A(self.opcode)
-            elif self.opcode & 0xF015 == 0xF015:
-                self.op_Fx15(self.opcode)
-            elif self.opcode & 0xF018 == 0xF018:
-                self.op_Fx18(self.opcode)
-            elif self.opcode & 0xF01E == 0xF01E:
-                self.op_Fx1E(self.opcode)
-            elif self.opcode & 0xF029 == 0xF029:
-                self.op_Fx29(self.opcode)
-            elif self.opcode & 0xF033 == 0xF033:
-                self.op_Fx33(self.opcode)
-            elif self.opcode & 0xF055 == 0xF055:
-                self.op_Fx55(self.opcode)
-            elif self.opcode & 0xF065 == 0xF065:
-                self.op_Fx65(self.opcode)
-        except Exception as e:
-            print(e)
+        opcode_identifier = self.opcode >> 12
+        self.function_switch[opcode_identifier]()
 
 
     def count_down_timers(self):
@@ -242,3 +228,128 @@ class Chip8():
             240, 128, 240, 128, 128
         ]
         return fonts
+
+    def zero_functions(self):
+        opcode_identifier = self.opcode & 0xFF
+        try:
+            self.zero_opcodes[opcode_identifier]()
+        except Exception:
+            QtWidgets.QMessageBox.warning(
+                None, 'Error',
+                'Unsupported Opcode "0nnn"',
+                QtWidgets.QMessageBox.Ok)
+
+    def eight_functions(self):
+        opcode_identifier = self.opcode & 0xF
+        self.eight_opcodes[opcode_identifier]()
+
+    def e_functions(self):
+        opcode_identifier = self.opcode & 0xFF
+        self.e_opcodes[opcode_identifier]()
+
+    def f_functions(self):
+        opcode_identifier = self.opcode & 0xFF
+        self.f_opcodes[opcode_identifier]()
+
+    def op_00E0(self):
+        print("00E0")
+
+    def op_00EE(self):
+        print("00EE")
+
+    def op_1nnn(self):
+        print("1nnn")
+
+    def op_2nnn(self):
+        print("2nnn")
+
+    def op_3xkk(self):
+        print("3xkk")
+
+    def op_4xkk(self):
+        print("4xkk")
+
+    def op_5xy0(self):
+        print("5xy0")
+
+    def op_6xkk(self):
+        print("6xkk")
+
+    def op_7xkk(self):
+        print("7xkk")
+
+    def op_8xy0(self):
+        print("8xy0")
+
+    def op_8xy1(self):
+        print("8xy1")
+
+    def op_8xy2(self):
+        print("8xy2")
+
+    def op_8xy3(self):
+        print("8xy3")
+
+    def op_8xy4(self):
+        print("8xy4")
+
+    def op_8xy5(self):
+        print("8xy5")
+
+    def op_8xy6(self):
+        print("8xy6")
+
+    def op_8xy7(self):
+        print("8xy7")
+
+    def op_8xyE(self):
+        print("8xyE")
+
+    def op_9xy0(self):
+        print("9xy0")
+
+    def op_Annn(self):
+        print("Annn")
+
+    def op_Bnnn(self):
+        print("Bnnn")
+
+    def op_Cxkk(self):
+        print("Cxkk")
+
+    def op_Dxyn(self):
+        print("Dxyn")
+
+    def op_Ex9E(self):
+        print("Ex9E")
+
+    def op_ExA1(self):
+        print("ExA1")
+
+    def op_Fx07(self):
+        print("Fx07")
+
+    def op_Fx0A(self):
+        print("Fx0A")
+
+    def op_Fx15(self):
+        print("Fx15")
+
+    def op_Fx18(self):
+        print("Fx18")
+
+    def op_Fx1E(self):
+        print("Fx1E")
+
+    def op_Fx29(self):
+        print("Fx29")
+
+    def op_Fx33(self):
+        print("Fx33")
+
+    def op_Fx55(self):
+        print("Fx55")
+
+    def op_Fx65(self):
+        print("Fx65")
+
