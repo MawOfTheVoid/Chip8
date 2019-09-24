@@ -1,5 +1,6 @@
 from opcode_variables import get_nnn, get_x, get_y, get_kk
 from PySide2 import QtWidgets
+from random import randint
 import binascii
 import pygame
 import sys
@@ -374,7 +375,7 @@ class Chip8():
             self.register[15] = 1
 
     def op_8xyE(self):
-        print("8xyE")
+        #print("8xyE")
         x = get_x(self.opcode)
         y = get_y(self.opcode)
         self.register[15] = self.register[x] & 0x0001
@@ -383,18 +384,24 @@ class Chip8():
             self.register[x] = self.register[x] & 0xFF
 
     def op_9xy0(self):
-        print("9xy0")
+        #print("9xy0")
         x = get_x(self.opcode)
         y = get_y(self.opcode)
 
     def op_Annn(self):
-        print("Annn")
+        #print("Annn")
+        self.I_register = get_nnn(self.opcode)
 
     def op_Bnnn(self):
-        print("Bnnn")
+        #print("Bnnn")
+        self.I_register = get_nnn(self.opcode) + self.register[0]
 
     def op_Cxkk(self):
-        print("Cxkk")
+        #print("Cxkk")
+        x = get_x(self.opcode)
+        kk = get_kk(self.opcode)
+        rand = randint(0, 255)
+        self.register[x] = kk & rand
 
     def op_Dxyn(self):
         print("Dxyn")
