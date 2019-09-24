@@ -53,7 +53,7 @@ class Screen():
         for row_number, row in enumerate(self.screen_matrix):
             rect_top = self.rect_height * row_number
             for pixel_number, pixel in enumerate(row):
-                if pixel == 1:
+                if pixel:
                     pygame.draw.rect(
                         self.screen, self.on_pixel_color,
                         pygame.Rect(
