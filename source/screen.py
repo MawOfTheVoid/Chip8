@@ -7,6 +7,7 @@ class Screen():
         self.monitor_width = pygame.display.Info().current_w
         self.monitor_height = pygame.display.Info().current_h
         self.screen_matrix = [[0 for x in range(64)] for y in range(32)]
+        # self.screen_matrix[31][63] = 1
         self.on_pixel_color = on_pixel_color
         self.off_pixel_color = off_pixel_color
         self.rect_width = 0

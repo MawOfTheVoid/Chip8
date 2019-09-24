@@ -11,3 +11,6 @@ def get_y(opcode):
 
 def get_kk(opcode):
     return opcode & 0x00FF
+
+def get_n(opcode):
+    return opcode & 0x000F
