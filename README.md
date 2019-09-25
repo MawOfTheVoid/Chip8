@@ -1,6 +1,12 @@
 # Chip8
-<img src="source/Chip8Boy.png" width=100 align="right">
+<img src="source/Chip8Boy.png" width=60 align="right">
 A Chip 8 interpreter written in Python.
+
+
+
+
+
+
 
 ## Requirements
 * Written in Python 3.7.2 but should work down to Python 3.6
