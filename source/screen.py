@@ -62,5 +62,5 @@ class Screen():
                             rect_top, self.rect_width,
                             self.rect_height)
                     )
-        self.clock.tick(60)
+        self.clock.tick(240)
         pygame.display.flip()
