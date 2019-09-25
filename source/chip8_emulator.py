@@ -255,87 +255,90 @@ class Chip8():
         self.f_opcodes[opcode_identifier]()
 
     def op_00E0(self):
-        print("00E0")
+        #print("00E0")
         for row in self.screen.screen_matrix:
             for index, pixel in enumerate(row):
                 row[index] = 0
 
     def op_00EE(self):
-        print("00EE")
+        #print("00EE")
         self.pc = self.stack.pop()
 
     def op_1nnn(self):
-        print("1nnn")
-        self.pc = get_nnn(self.opcode)
-
-    def op_2nnn(self):
-        print("2nnn")
+        ##print("1nnn")
         nnn = get_nnn(self.opcode)
-        self.pc += 2
-        self.stack.append(self.pc)
+        #print("1nnn", hex(nnn))
         self.pc = nnn
 
+    def op_2nnn(self):
+        #print("2nnn")
+        nnn = get_nnn(self.opcode)
+        adress = self.pc
+        self.stack.append(adress)
+        self.pc = nnn
+        #print("2nnn", f"nnn={hex(nnn)}  ", f"self.pc={hex(self.pc)} ", f"adress={hex(adress)}   ", f"memory_value_after_jump={hex(self.memory[self.pc])}")
+
     def op_3xkk(self):
-        print("3xkk")
         x = get_x(self.opcode)
         kk = get_kk(self.opcode)
-        if x == kk:
+        #print("3xkk", f"x={hex(x)}", f"kk={hex(kk)}")
+        if self.register[x] == kk:
             self.pc += 2
 
     def op_4xkk(self):
-        print("4xkk")
+        #print("4xkk")
         x = get_x(self.opcode)
         kk = get_kk(self.opcode)
-        if x != kk:
+        if self.register[x] != kk:
             self.pc += 2
 
     def op_5xy0(self):
-        print("5xy0")
+        #print("5xy0")
         x = get_x(self.opcode)
         y = get_y(self.opcode)
-        if x == y:
+        if self.register[x] == self.register[y]:
             self.pc += 2
 
     def op_6xkk(self):
-        print("6xkk")
         x = get_x(self.opcode)
         kk = get_kk(self.opcode)
+        #print("6xkk", f"x={hex(x)}", f"kk={hex(kk)}")
         self.register[x] = kk
 
     def op_7xkk(self):
-        print("7xkk")
+        #print("7xkk")
         x = get_x(self.opcode)
         kk = get_kk(self.opcode)
-        self.register[x] += kk
+        self.register[x] = kk + self.register[x]
         if self.register[x] > 255:
             self.register[x] = self.register[x] & 0xFF
 
     def op_8xy0(self):
-        print("8xy0")
+        #print("8xy0")
         x = get_x(self.opcode)
         y = get_y(self.opcode)
         self.register[x] = self.register[y]
 
     def op_8xy1(self):
-        print("8xy1")
+        #print("8xy1")
         x = get_x(self.opcode)
         y = get_y(self.opcode)
         self.register[x] = self.register[x] | self.register[y]
 
     def op_8xy2(self):
-        print("8xy2")
+        #print("8xy2")
         x = get_x(self.opcode)
         y = get_y(self.opcode)
         self.register[x] = self.register[x] & self.register[y]
 
     def op_8xy3(self):
-        print("8xy3")
+        #print("8xy3")
         x = get_x(self.opcode)
         y = get_y(self.opcode)
         self.register[x] = self.register[x] ^ self.register[y]
 
     def op_8xy4(self):
-        print("8xy4")
+        #print("8xy4")
         x = get_x(self.opcode)
         y = get_y(self.opcode)
         self.register[x] += self.register[y]
@@ -346,28 +349,28 @@ class Chip8():
             self.register[15] = 0
 
     def op_8xy5(self):
-        print("8xy5")
+        #print("8xy5")
         x = get_x(self.opcode)
         y = get_y(self.opcode)
         self.register[x] -= self.register[y]
-        if self.register[x] < 0:
+        if self.register[x] <= 0:
             self.register[15] = 0
             self.register[x] = self.register[x] & 0xFF
-        elif self.register[x] >= 0:
+        elif self.register[x] > 0:
             self.register[15] = 1
 
     def op_8xy6(self):
-        print("8xy6")
+        #print("8xy6")
         x = get_x(self.opcode)
         y = get_y(self.opcode)
         self.register[15] = self.register[x] & 0x0001
-        self.register[x] = self.register[x] // self.register[y]
+        self.register[x] = self.register[x] // 2
 
     def op_8xy7(self):
-        print("8xy7")
+        #print("8xy7")
         x = get_x(self.opcode)
         y = get_y(self.opcode)
-        self.register[x] -= self.register[y]
+        self.register[x] = self.register[y] - self.register[x]
         if self.register[x] < 0:
             self.register[15] = 0
             self.register[x] = self.register[x] & 0xFF
@@ -375,36 +378,40 @@ class Chip8():
             self.register[15] = 1
 
     def op_8xyE(self):
-        print("8xyE")
+        #print("8xyE")
         x = get_x(self.opcode)
         y = get_y(self.opcode)
-        self.register[15] = self.register[x] & 0x0001
-        self.register[x] *= self.register[y]
+        self.register[15] = self.register[x] & 0x80
+        self.register[x] *= 2
         if self.register[x] > 255:
             self.register[x] = self.register[x] & 0xFF
 
     def op_9xy0(self):
-        print("9xy0")
+        #print("9xy0")
         x = get_x(self.opcode)
         y = get_y(self.opcode)
+        if self.register[x] != self.register[y]:
+            self.pc += 2
 
     def op_Annn(self):
-        print("Annn")
-        self.I_register = get_nnn(self.opcode)
+        #print("Annn")
+        nnn = get_nnn(self.opcode)
+        self.I_register = nnn
 
     def op_Bnnn(self):
-        print("Bnnn")
-        self.I_register = get_nnn(self.opcode) + self.register[0]
+        #print("Bnnn")
+        nnn = get_nnn(self.opcode)
+        self.pc = nnn + self.register[0]
 
     def op_Cxkk(self):
-        print("Cxkk")
+        #print("Cxkk")
         x = get_x(self.opcode)
         kk = get_kk(self.opcode)
         rand = randint(0, 255)
         self.register[x] = kk & rand
 
     def op_Dxyn(self):
-        print("Dxyn")
+        #print("Dxyn")
         x = get_x(self.opcode)
         y = get_y(self.opcode)
         n = get_n(self.opcode)
@@ -416,24 +423,24 @@ class Chip8():
 
 
     def op_Ex9E(self):
-        print("Ex9E")
+        #print("Ex9E")
         x = get_x(self.opcode)
-        if self.keyboard_register[x]:
+        if self.keyboard_register[self.register[x]]:
             self.pc += 2
 
     def op_ExA1(self):
-        print("ExA1")
+        #print("ExA1")
         x = get_x(self.opcode)
-        if not self.keyboard_register[x]:
+        if not self.keyboard_register[self.register[x]]:
             self.pc += 2
 
     def op_Fx07(self):
-        print("Fx07")
+        #print("Fx07")
         x = get_x(self.opcode)
         self.register[x] = self.delay_timer
 
     def op_Fx0A(self):
-        print("Fx0A")
+        #print("Fx0A")
         x = get_x(self.opcode)
         not_pressed = True
         while not_pressed:
@@ -448,35 +455,35 @@ class Chip8():
 
 
     def op_Fx15(self):
-        print("Fx15")
+        #print("Fx15")
         x = get_x(self.opcode)
         self.delay_timer = self.register[x]
 
     def op_Fx18(self):
-        print("Fx18")
+        #print("Fx18")
         x = get_x(self.opcode)
         self.music_timer = self.register[x]
 
     def op_Fx1E(self):
-        print("Fx1E")
+        #print("Fx1E")
         x = get_x(self.opcode)
         self.I_register += x
 
     def op_Fx29(self):
-        print("Fx29")
+        #print("Fx29")
         x = get_x(self.opcode)
-        self.I_register = x * 5
+        self.I_register = self.register[x] * 5
 
 
     def op_Fx33(self):
-        print("Fx33")
+        #print("Fx33")
         x = get_x(self.opcode)
         bcd_repr = self.get_binary_decimal(x)
         for index, number in enumerate(bcd_repr):
             self.memory[self.I_register + index] = number
 
     def op_Fx55(self):
-        print("Fx55")
+        #print("Fx55")
         x = get_x(self.opcode)
         for index, value in enumerate(self.register):
             self.memory[self.I_register + index] = value
@@ -484,7 +491,7 @@ class Chip8():
                 break
 
     def op_Fx65(self):
-        print("Fx65")
+        #print("Fx65")
         x = get_x(self.opcode)
         for index, value in enumerate(self.register):
             self.register[index] = self.memory[self.I_register + index]
@@ -506,8 +513,8 @@ class Chip8():
         return array
 
     def get_coordinates(self, y, y_index, x, x_index):
-        current_y = y + y_index
-        current_x = x + x_index
+        current_y = self.register[y] + y_index
+        current_x = self.register[x] + x_index
         # - screen_width / height to account for 0
         if current_y > 31:
             current_y -= 32
