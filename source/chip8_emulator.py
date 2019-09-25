@@ -529,6 +529,7 @@ class Chip8():
         self.screen.screen_matrix[current_y][current_x] = screen_value ^ pixel_value
 
     def get_binary_decimal(self, x):
+        x = self.register[x]
         x = list(str(x))
         x = [int(digit) for digit in x]
         if len(x) == 3:
