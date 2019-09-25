@@ -54,11 +54,14 @@ class Launcher():
     def start_game_btn_pressed(self):
         if self.rom_path != "":
             self.launcher_window.close()
-            start_emulation(self.rom_path, self.on_pixel_color, self.off_pixel_color)
+            start_emulation(
+                self.rom_path, self.on_pixel_color,
+                self.off_pixel_color, self.fps_box.value()
+            )
 
     def create_window(self):
         self.launcher_window = QtWidgets.QMainWindow()
-        self.launcher_window.resize(290, 180)
+        self.launcher_window.resize(260, 290)
         self.launcher_window.setWindowTitle("Chip8 Launcher")
         self.launcher_window.setWindowIcon(QtGui.QIcon("Chip8Boy.png"))
 
@@ -103,6 +106,22 @@ class Launcher():
         self.off_pixel_lbl.setAlignment(QtCore.Qt.AlignCenter)
         self.off_pixel_lbl.setText("Off Pixel Color")
         self.gridLayout.addWidget(self.off_pixel_lbl, 0, 1, 1, 1)
+
+        self.fps_lbl = QtWidgets.QLabel(self.centralwidget)
+        size_policy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Maximum)
+        self.fps_lbl.setSizePolicy(size_policy)
+        self.fps_lbl.setAlignment(QtCore.Qt.AlignCenter)
+        self.fps_lbl.setText("CPU cycles / second")
+        self.fps_lbl.setToolTip("Controls the game speed.")
+        self.verticalLayout_2.addWidget( self.fps_lbl)
+
+        self.fps_box = QtWidgets.QSpinBox(self.centralwidget)
+        size_policy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Maximum)
+        self.fps_box.setSizePolicy(size_policy)
+        self.fps_box.setAlignment(QtCore.Qt.AlignCenter)
+        self.fps_box.setRange(1, 1000)
+        self.fps_box.setValue(240)
+        self.verticalLayout_2.addWidget(self.fps_box)
 
         self.verticalLayout_2.addLayout(self.gridLayout)
         self.launcher_window.setCentralWidget(self.centralwidget)

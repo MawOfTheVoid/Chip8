@@ -3,7 +3,8 @@ import pygame
 
 class Screen():
 
-    def __init__(self, on_pixel_color, off_pixel_color):
+    def __init__(self, on_pixel_color, off_pixel_color, game_speed):
+        self.game_speed = game_speed
         self.monitor_width = pygame.display.Info().current_w
         self.monitor_height = pygame.display.Info().current_h
         self.screen_matrix = [[0 for x in range(64)] for y in range(32)]
@@ -62,5 +63,5 @@ class Screen():
                             rect_top, self.rect_width,
                             self.rect_height)
                     )
-        self.clock.tick(240)
+        self.clock.tick(self.game_speed)
         pygame.display.flip()
